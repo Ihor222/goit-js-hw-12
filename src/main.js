@@ -1,74 +1,96 @@
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
+
 import { getImagesByQuery } from './js/pixabay-api.js';
 import {
   createGallery,
   clearGallery,
   showLoader,
   hideLoader,
+  hideLoadMoreButton,
   showLoadMoreButton,
 } from './js/render-functions.js';
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css';
 
 const form = document.querySelector('.form');
 const loadMoreBtn = document.querySelector('.load-more');
 
-let query = '';
+let query;
 let page = 1;
-let totalHits = 0;
+const perPage = 15;
 
-form.addEventListener('submit', async e => {
+form.addEventListener('submit', e => {
   e.preventDefault();
-  query = e.target.elements.searchQuery.value.trim();
 
-  if (!query) {
-    iziToast.error({ message: 'Please enter a search term!' });
-    return;
-  }
+  hideLoadMoreButton();
 
-  page = 1;
   clearGallery();
 
-  await fetchAndRenderImages();
+  query = e.target.elements['search-text'].value.trim();
+
+  if (!query) return;
+
+  page = 1;
+
+  showImages(query);
 });
 
-loadMoreBtn.addEventListener('click', async () => {
-  page += 1;
-  await fetchAndRenderImages(true);
+loadMoreBtn.addEventListener('click', e => {
+  hideLoadMoreButton();
+
+  page++;
+
+  showImages(query);
+
+  scrollView();
 });
 
-async function fetchAndRenderImages(append = false) {
+async function showImages(query) {
+  showLoader();
+
   try {
-    showLoader();
+    const data = await getImagesByQuery(query, page, perPage);
+    const images = data.hits;
 
-    const data = await getImagesByQuery(query, page);
+    if (images && images.length > 0) {
+      createGallery(images);
 
-    if (data.hits.length === 0) {
-      iziToast.info({ message: 'No images found. Try a different query.' });
-      return;
+      if (page >= Math.ceil(data.totalHits / perPage)) {
+        iziToast.show({
+          title: 'ℹ️',
+          message: "We're sorry, but you've reached the end of search results.",
+          messageColor: 'white',
+          titleColor: 'white',
+          backgroundColor: '#4CAF50',
+          position: 'topRight',
+        });
+      } else {
+        showLoadMoreButton();
+      }
+    } else {
+      iziToast.show({
+        title: '❌',
+        message: `Sorry, there are no images matching your search query. Please try again!`,
+        messageColor: 'white',
+        titleColor: 'white',
+        backgroundColor: '#ef4040',
+        position: 'topRight',
+      });
     }
-
-    createGallery(data.hits);
-    totalHits = data.totalHits;
-
-    // Завжди показуємо кнопку "Load More"
-    showLoadMoreButton();
-
-    if (append) {
-      scrollToNewContent();
-    }
-  } catch (error) {
-    iziToast.error({ message: 'Failed to fetch images. Try again later.' });
+  } catch (err) {
+    console.error(err);
   } finally {
     hideLoader();
   }
 }
 
-function scrollToNewContent() {
-  const { height: cardHeight } =
-    document.querySelector('.gallery-item').getBoundingClientRect();
-
-  window.scrollBy({
-    top: cardHeight * 2,
-    behavior: 'smooth',
-  });
+function scrollView() {
+  const galleryItem = document.querySelector('.gallery-item');
+  if (!galleryItem) return;
+  setTimeout(() => {
+    scrollBy({
+      top: galleryItem.getBoundingClientRect().height * 2,
+      left: 0,
+      behavior: 'smooth',
+    });
+  }, 200);
 }
