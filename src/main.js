@@ -5,7 +5,6 @@ import {
   showLoader,
   hideLoader,
   showLoadMoreButton,
-  hideLoadMoreButton,
 } from './js/render-functions.js';
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
@@ -28,7 +27,6 @@ form.addEventListener('submit', async e => {
 
   page = 1;
   clearGallery();
-  hideLoadMoreButton();
 
   await fetchAndRenderImages();
 });
@@ -46,22 +44,14 @@ async function fetchAndRenderImages(append = false) {
 
     if (data.hits.length === 0) {
       iziToast.info({ message: 'No images found. Try a different query.' });
-      hideLoadMoreButton();
       return;
     }
 
     createGallery(data.hits);
     totalHits = data.totalHits;
 
-    if (page * 15 >= totalHits) {
-  hideLoadMoreButton();
-  iziToast.info({
-    message: "We're sorry, but you've reached the end of search results.",
-  });
-} else {
-  showLoadMoreButton();
-}
-
+    // Завжди показуємо кнопку "Load More"
+    showLoadMoreButton();
 
     if (append) {
       scrollToNewContent();
