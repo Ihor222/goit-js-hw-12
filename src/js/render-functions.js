@@ -1,52 +1,62 @@
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-const galleryContainer = document.querySelector('.gallery');
-const loadMoreBtn = document.querySelector('.load-more');
+const gallery = document.querySelector('.gallery');
 const loader = document.querySelector('.loader');
+const loadMoreBtn = document.querySelector('.load-more');
 
-const lightbox = new SimpleLightbox('.gallery a', {
+const galleryBox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
 });
 
 export function createGallery(images) {
-  const markup = images.map(image => `
-    <div class="gallery-item">
-      <a href="${image.largeImageURL}">
-        <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" />
-      </a>
-      <div class="image-info">
-        <p><strong>Likes:</strong> ${image.likes}</p>
-        <p><strong>Views:</strong> ${image.views}</p>
-        <p><strong>Downloads:</strong> ${image.downloads}</p>
-        <p><strong>Comments:</strong> ${image.comments}</p>
-      </div>
-    </div>
-  `).join('');
+  const markup = images
+    .map(image => {
+      const {
+        webformatURL,
+        largeImageURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      } = image;
+      return `
+      <li class="gallery-item">
+        <a href="${largeImageURL}"><img class="gallery-image" src="${webformatURL}" alt="${tags}"/></a>
+        <div class="stats">
+          <p><span>Likes</span><span>${likes}</span></p>
+          <p><span>Views</span><span>${views}</span></p>
+          <p><span>Comments</span><span>${comments}</span></p>
+          <p><span>Downloads</span><span>${downloads}</span></p>
+        </div>
+      </li>
+        `;
+    })
+    .join('');
 
-  galleryContainer.insertAdjacentHTML('beforeend', markup);
-  lightbox.refresh();
+  gallery.insertAdjacentHTML('beforeend', markup);
+
+  galleryBox.refresh();
 }
 
-
-
 export function clearGallery() {
-  galleryContainer.innerHTML = '';
+  gallery.innerHTML = '';
 }
 
 export function showLoader() {
-  loader.classList.remove('is-hidden');
+  loader.style.visibility = 'visible';
 }
 
 export function hideLoader() {
-  loader.classList.add('is-hidden');
+  loader.style.visibility = 'hidden';
 }
 
 export function showLoadMoreButton() {
-  loadMoreBtn.classList.remove('is-hidden');
+  loadMoreBtn.style.visibility = 'visible';
 }
 
 export function hideLoadMoreButton() {
-  loadMoreBtn.classList.add('is-hidden'); 
+  loadMoreBtn.style.visibility = 'hidden';
 }
