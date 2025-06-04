@@ -12,14 +12,24 @@ const lightbox = new SimpleLightbox('.gallery a', {
 
 export function createGallery(images) {
   const markup = images.map(image => `
-    <a class="gallery-item" href="${image.largeImageURL}">
-      <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" />
-    </a>
+    <div class="gallery-item">
+      <a href="${image.largeImageURL}">
+        <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" />
+      </a>
+      <div class="image-info">
+        <p><strong>Likes:</strong> ${image.likes}</p>
+        <p><strong>Views:</strong> ${image.views}</p>
+        <p><strong>Downloads:</strong> ${image.downloads}</p>
+        <p><strong>Comments:</strong> ${image.comments}</p>
+      </div>
+    </div>
   `).join('');
 
   galleryContainer.insertAdjacentHTML('beforeend', markup);
   lightbox.refresh();
 }
+
+
 
 export function clearGallery() {
   galleryContainer.innerHTML = '';
