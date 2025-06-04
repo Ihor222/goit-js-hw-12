@@ -54,13 +54,14 @@ async function fetchAndRenderImages(append = false) {
     totalHits = data.totalHits;
 
     if (page * 15 >= totalHits) {
-      hideLoadMoreButton();
-      iziToast.info({
-        message: "We're sorry, but you've reached the end of search results.",
-      });
-    } else {
-      showLoadMoreButton();
-    }
+  hideLoadMoreButton();
+  iziToast.info({
+    message: "We're sorry, but you've reached the end of search results.",
+  });
+} else {
+  showLoadMoreButton();
+}
+
 
     if (append) {
       scrollToNewContent();
