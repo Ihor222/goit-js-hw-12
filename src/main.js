@@ -22,7 +22,6 @@ form.addEventListener('submit', e => {
   e.preventDefault();
 
   hideLoadMoreButton();
-
   clearGallery();
 
   query = e.target.elements['search-text'].value.trim();
@@ -36,12 +35,8 @@ form.addEventListener('submit', e => {
 
 loadMoreBtn.addEventListener('click', e => {
   hideLoadMoreButton();
-
   page++;
-
   showImages(query);
-
-  scrollView();
 });
 
 async function showImages(query) {
@@ -53,6 +48,7 @@ async function showImages(query) {
 
     if (images && images.length > 0) {
       createGallery(images);
+      scrollView(); // Прокрутка після додавання нових зображень
 
       if (page >= Math.ceil(data.totalHits / perPage)) {
         iziToast.show({
